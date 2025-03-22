@@ -1,28 +1,35 @@
-import axios from "axios";
-const API_KEY = "49321124-d9248d4be3ea0dc21aad93268";
-const BASE_URL = "https://pixabay.com/api/";
 
+import SimpleLightbox from "simplelightbox";
+// Додатковий імпорт стилів
+import "simplelightbox/dist/simple-lightbox.min.css";
 
+export function renderGallery(images) {
+    const gallery = document.querySelector(".gallery");
+    
+ 
+  
+  gallery.innerHTML = images.map(image => `
+    <li class="gallery-item">
+      <a href="${image.largeImageURL}" class="gallery-link">
+        <img src="${image.webformatURL}" alt="${image.tags}" loading="lazy">
+      </a>
+      <div class="info">
+        <p><span class="matter">Likes</span> ${image.likes}</p>
+        <p><span class="matter">Views</span> ${image.views}</p>
+        <p><span class="matter">Comments</span> ${image.comments}</p>
+        <p><span class="matter">Downloads</span> ${image.downloads}</p>
+      </div>
+    </li>
+  `).join("");
+    const lightbox = new SimpleLightbox(".gallery a", {
+        captionsData: "alt", 
+        captionDelay: 250 
+    });
 
-export function fetchImages(query) {
-
-    return axios.get(BASE_URL, {
-        params: {
-            key: API_KEY,
-            q: query,
-            image_type: "photo",
-            orientation: "horizontal",
-            safesearch: true,
-        },
-    })
-        .then(response => {
-            return response.data.hits
-        })
-        .catch(error => {
-            console.error("Error fetching images:", error);
-            return [];
-        });
+    lightbox.refresh();
 }
+
+
 
 
 
