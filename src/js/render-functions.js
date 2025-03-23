@@ -3,12 +3,12 @@ import SimpleLightbox from "simplelightbox";
 // Додатковий імпорт стилів
 import "simplelightbox/dist/simple-lightbox.min.css";
 
-export function renderGallery(images) {
-    const gallery = document.querySelector(".gallery");
-    
- 
-  
-  gallery.innerHTML = images.map(image => `
+export async function renderGallery(images) {
+  const gallery = document.querySelector(".gallery");
+  try {
+    gallery.innerHTML = "";
+        
+    gallery.innerHTML = images.map(image => `
     <li class="gallery-item">
       <a href="${image.largeImageURL}" class="gallery-link">
         <img src="${image.webformatURL}" alt="${image.tags}" loading="lazy">
@@ -22,14 +22,12 @@ export function renderGallery(images) {
     </li>
   `).join("");
     const lightbox = new SimpleLightbox(".gallery a", {
-        captionsData: "alt", 
-        captionDelay: 250 
+      captionsData: "alt",
+      captionDelay: 250
     });
 
     lightbox.refresh();
+ } catch (error) {
+    console.error("Error rendering gallery:", error);
+  }
 }
-
-
-
-
-

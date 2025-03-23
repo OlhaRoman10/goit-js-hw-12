@@ -63,6 +63,15 @@ button {
 button:hover {
   background: #6c8cff;
 }
+.btn {
+  display: flex;
+  flex-direction: row;
+  margin: 32px auto 34px;
+  width: 125px;
+  height: auto;
+  justify-content: center;
+
+}
 
 ul {
   display: flex;
