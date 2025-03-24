@@ -12,6 +12,7 @@ const loadMoreBtn = document.querySelector(".btn");
 
 let totalHits = 0; // Загальна кількість знайдених зображень
 let loadedImages = 0; // Кількість вже завантажених зображень
+let currentQuery = ""; // Змінна для збереження поточного запиту
 
 loader.classList.add("hidden");
 loadMoreBtn.classList.add("hidden"); // Ховаємо кнопку "Load more" на старті
@@ -31,6 +32,13 @@ function showLoadMoreBtn() {
 function hideLoadMoreBtn() {
   loadMoreBtn.classList.add("hidden");
 }
+function smoothScroll() {
+  const cardHeight = document.querySelector(".gallery-item")?.getBoundingClientRect().height || 0;
+  window.scrollBy({
+    top: cardHeight * 2,
+    behavior: "smooth",
+  });
+}
 
 form.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -40,6 +48,12 @@ form.addEventListener("submit", async (event) => {
         iziToast.error({ message: "Please enter a search query!" })
         return;
     }
+     if (query !== currentQuery) {
+    currentQuery = query;
+         loadedImages = 0; // Скидаємо кількість завантажених зображень для нового запиту
+         page = 1; // ВАЖЛИВО! Скидаємо пагінацію до першої сторінки
+    }
+    
     gallery.innerHTML = ""; // Очищаємо галерею перед новим пошуком
     hideLoadMoreBtn(); // Ховаємо кнопку "Load more" перед новим пошуком
     showLoader();
