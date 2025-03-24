@@ -4,11 +4,13 @@ const BASE_URL = "https://pixabay.com/api/";
 
 let page = 1;
 let currentQuery = ""; // Глобальна змінна для збереження запиту
+let totalHits = 0;
 
 export async function fetchImages(query, isNewSearch = false) {
     if (isNewSearch) {
         page = 1; // Якщо новий пошук — скидаємо сторінку
         currentQuery = query; // Оновлюємо збережений запит
+         totalHits = 0; // Скидаємо загальну кількість результатів
     }
     try {
         const response = await axios.get(BASE_URL, {
@@ -22,15 +24,17 @@ export async function fetchImages(query, isNewSearch = false) {
                 page: page, // Передаємо поточну сторінку
             }
         });
+ if (isNewSearch) {
+            totalHits = response.data.totalHits; // Отримуємо загальну кількість зображень
+        }
+
  if (response.data.hits.length > 0) {
  page += 1; // Збільшуємо сторінку тільки якщо отримали результати
-        }
-       
-       
-        return response.data.hits;
+        }    
+        return { images:response.data.hits, totalHits }; //не дуже тут зрозуміла
     } catch (error) {
         console.error("Error fetching images:", error);
-        return [];
+        return { images: [], totalHits: 0 };
     }
 }
             

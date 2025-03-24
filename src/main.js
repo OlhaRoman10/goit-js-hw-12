@@ -10,6 +10,9 @@ const input = form.querySelector("input[name='search-text']");
 const gallery = document.querySelector(".gallery");
 const loadMoreBtn = document.querySelector(".btn");
 
+let totalHits = 0; // Загальна кількість знайдених зображень
+let loadedImages = 0; // Кількість вже завантажених зображень
+
 loader.classList.add("hidden");
 loadMoreBtn.classList.add("hidden"); // Ховаємо кнопку "Load more" на старті
 
@@ -38,20 +41,26 @@ form.addEventListener("submit", async (event) => {
         return;
     }
     gallery.innerHTML = ""; // Очищаємо галерею перед новим пошуком
-
     hideLoadMoreBtn(); // Ховаємо кнопку "Load more" перед новим пошуком
-    
     showLoader();
 
     try {
-        const images = await fetchImages(query, true);
+        const response = await fetchImages(query, true);
+        if (!response || !response.images) throw new Error("Invalid response from API");
+
+    const { images, totalHits: newTotalHits } = response;
+        totalHits = newTotalHits; // Оновлюємо загальну кількість знайдених зображень
+        loadedImages = images.length; // Оновлюємо кількість завантажених зображень
+        
         if (images.length === 0) {
             iziToast.error({
                 message: "Sorry, there are no images matching your search query. Please try again!", position: "topRight",
             });
         } else {
             renderGallery(images);
-            showLoadMoreBtn(); // Показуємо кнопку "Load more", якщо є результати
+            if (loadedImages < totalHits) {
+        showLoadMoreBtn(); // Показуємо кнопку "Load more", якщо є ще зображення
+            }
         }
     } catch (error) {
         iziToast.error({ message: "Something went wrong. Please try again later." });
@@ -62,12 +71,16 @@ form.addEventListener("submit", async (event) => {
 
 loadMoreBtn.addEventListener("click", async () => {
   showLoader(); // Показуємо loader під час завантаження нової сторінки
-
+        
   try {
-    const images = await fetchImages(input.value.trim());
+      const response = await fetchImages(input.value.trim());
+    if (!response || !response.images) throw new Error("Invalid response from API");
+
+      const { images } = response;
+      loadedImages += images.length; // Додаємо кількість завантажених зображень
     
-    if (images.length === 0) {
-      iziToast.info({ message: "No more images to load." });
+    if (images.length === 0 || loadedImages >= totalHits) {
+      iziToast.info({ message: "We're sorry, but you've reached the end of search results." });
       hideLoadMoreBtn(); // Ховаємо кнопку, якщо більше немає зображень
     } else {
       renderGallery(images, true); // Додаємо нові зображення до галереї
