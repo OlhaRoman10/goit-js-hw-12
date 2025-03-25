@@ -63,17 +63,18 @@ form.addEventListener("submit", async (event) => {
 
   try {
     const response = await fetchImages(currentQuery, page);
-    if (!response || !response.hits) throw new Error("Invalid response from API");
+    if (!response || !response.images) throw new Error("Invalid response from API");
 
-    const images = response.hits;
+    const images = response.images;
     totalHits = response.totalHits; // Оновлюємо загальну кількість знайдених зображень
     loadedImages = images.length; // Оновлюємо кількість завантажених зображень
 
-    if (images.length === 0) {
-      iziToast.error({
-        message: "Sorry, there are no images matching your search query. Please try again!",
-        position: "topRight",
-      });
+      if (images.length === 0) {
+          iziToast.error({
+              message: "Sorry, there are no images matching your search query. Please try again!",
+              position: "topRight",
+          });
+          return;
     } else {
       renderGallery(images);
 
@@ -95,9 +96,9 @@ loadMoreBtn.addEventListener("click", async () => {
 
   try {
     const response = await fetchImages(currentQuery, page);
-    if (!response || !response.hits) throw new Error("Invalid response from API");
+    if (!response || !response.images) throw new Error("Invalid response from API");
 
-    const images = response.hits;
+    const images = response.images;
     loadedImages += images.length; // Додаємо кількість завантажених зображень
 
     if (images.length === 0 || loadedImages >= totalHits) {
